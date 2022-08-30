@@ -15,7 +15,7 @@ const TodoForm = (props) => {
         
          <button className={`btn btn-${isEdit === true ? "success" : "primary"}`}
           type="submit">
-        {isEdit === true ? "Sakla" : "Ekle"}
+        {isEdit === true ? "Save" : "ADD"}
         
           </button>
       </div>        

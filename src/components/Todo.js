@@ -21,7 +21,7 @@ const Todo = (props) => {
           className="btn btn-sm btn-danger"
           onClick={() => deleteTodo(item.id)}
         >
-          Sil
+       Delete
         </button>
         <button
           className="btn btn-sm btn-success mx-1"
@@ -37,7 +37,7 @@ const Todo = (props) => {
           onClick={() => changeIsDone(item.id)}
           className="btn btn-sm btn-secondary"
         >
-          {item.isDone === false ? "Yapilacak" : "Yapildi"}
+          {item.isDone === false ? "Done" : "Undone"}
         </button>
       </div>
     </div>

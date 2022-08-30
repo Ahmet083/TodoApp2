@@ -83,7 +83,7 @@ function App() {
   };
     return (
     <div className="container">
-      <h1 className="text-center my-5">NURHAYAT'IN GOREV LISTESI <hr></hr> GRONINGEN</h1>
+      <h1 className="text-center my-5">Todo App <hr></hr> GRONINGEN</h1>
       <TodoForm
         handleSubmit={handleSubmit}
         todoText={todoText}
