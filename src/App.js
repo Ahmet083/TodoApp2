@@ -1,24 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Todo from "./components/Todo";
+import TodoForm from "./components/TodoForm";
 
 function App() {
   const [todoText, setTodoText] = useState("");
-  const [ todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
-  const [willUpdateTodo, setWillUpdateTodo] = useState("")
-  const [newTodo, setNewTodo] = useState("")
+  const [willUpdateTodo, setWillUpdateTodo] = useState("");
+
+  
+
+  useEffect(() => {
+    const todosFromLocalStorage = localStorage.getItem("todos");
+    console.log(todosFromLocalStorage);
+    if (todosFromLocalStorage === null) {
+      localStorage.setItem("todos", JSON.stringify([]));
+    } else {
+      setTodos(JSON.parse(todosFromLocalStorage));
+    }
+  }, []);
 
   const deleteTodo = (id) => {
-  const filteredTodos=todos.filter(item=>item.id !== id);
+  const filteredTodos = todos.filter((item) => item.id !== id);
   setTodos(filteredTodos);
-  }
-  //  const editTodos=(id) => {
-  //   console.log(id);
-  //   setIsEdit(true);
-  //   const searchedTodo = todos.find((item) => item.id === id);
-  //   setTodoText(searchedTodo.text);
-  //   };
-
-   
+  localStorage.setItem("todos", JSON.stringify(filteredTodos));
+};
 
   const changeIsDone = (id) => {
     const searchedTodo = todos.find((item) => item.id === id);
@@ -28,6 +34,10 @@ function App() {
     };
     const filteredTodos = todos.filter((item) => item.id !== id);
     setTodos([updatedTodo, ...filteredTodos]);
+    localStorage.setItem(
+      "todos",
+      JSON.stringify([updatedTodo, ...filteredTodos])
+    );
   };
 
   const handleSubmit = (event) => {
@@ -36,15 +46,25 @@ function App() {
       alert("Todo text can't be empty!");
       return;    
     }
+    const hasTodos = todos.find((item) => item.text === todoText);
+    console.log(hasTodos);
+    if (hasTodos !== undefined) {
+      alert("You have the todo already");
+      return;
+    }
     if (isEdit === true) {
-      console.log(willUpdateTodo, "Todo yu guncelleyecegim.")
-      const searchedTodo=todos.find(item=>item.id===willUpdateTodo)
-      const updatedTodo={
+      console.log(willUpdateTodo, " todo'yu güncelleyeceğiz");
+      const searchedTodo = todos.find(item => item.id === willUpdateTodo);
+      const updatedTodo = {
         ...searchedTodo,
-        text:todoText
-      }
-      const filteredTodos=todos.filter(item=>item.id !== willUpdateTodo)
-      setTodos([...filteredTodos, updatedTodo])
+        text: todoText,
+      };
+      const filteredTodos = todos.filter(item => item.id !== willUpdateTodo);
+      setTodos([...filteredTodos, updatedTodo]);
+      localStorage.setItem(
+        "todos",
+        JSON.stringify([...filteredTodos, updatedTodo])
+      );
       setTodoText("");
       setIsEdit(false);
       setWillUpdateTodo("");
@@ -52,76 +72,40 @@ function App() {
       const newTodo = {
         id: new Date().getTime(),
         isDone: false,
-        text:todoText,
-        date:new Date(),
+        text: todoText,
+        date: new Date(),
       };
-      
+      console.log("newTodo", newTodo);
+      setTodos([...todos, newTodo]);
+      localStorage.setItem("todos", JSON.stringify([...todos, newTodo]));
+      setTodoText("");
     }
-    const hasTodos = todos.find((item) => item.text === todoText);
-    console.log(hasTodos);
-    if (hasTodos !== undefined) {
-      alert("You have the todo already");
-      return;
-    } 
-  
-    console.log("newtTodo", newTodo)
-    setTodos([...todos, newTodo ]);
-    setTodoText("");
-  };  
-  return (
+  };
+    return (
     <div className="container">
-      <h1 className=" text-center my-5">Todo App Ahmet </h1>
-      <form onSubmit={handleSubmit}>
-      <div className="input-group mb-3">
-         <input 
-         value={todoText}
-         type="text" 
-         className="form-control" 
-         placeholder="Type Your Todo" 
-         onChange={(event) => setTodoText(event.target.value)}/>
-        
-         <button className={`btn btn-${isEdit === true ? "success" : "primary"}`}
-          type="submit" >
-        {isEdit === true ? "Save" : "ADD"}
-        
-          </button>
-      </div>        
-      </form>
-
+      <h1 className="text-center my-5">NURHAYAT'IN GOREV LISTESI <hr></hr> GRONINGEN</h1>
+      <TodoForm
+        handleSubmit={handleSubmit}
+        todoText={todoText}
+        setTodoText={setTodoText}
+        isEdit={isEdit}
+      />
       {todos.length <= 0 ? (
-        <p className="text-center my-5">You don t have todos yet.</p>
-         ) : ( 
-          <>
+        <p className="text-center my-5">You don't have any todos yet.</p>
+      ) : (
+        <>
           {todos.map((item) => (
-            <div className={`alert alert-${item.isDone===true ? "info" : "secondary"} 
-            d-flex justify-content-between align-items-center`}>
-            
-            <p>{item.text}</p>
-            <div>
-              <button className="btn btn-danger mx-1" onClick={() => deleteTodo(item.id)}>Delete</button>
-              <button 
-               className="btn btn-sm btn-success me-1" 
-              onClick={() => {
-                setIsEdit(true)
-                setWillUpdateTodo(item.id)
-                setTodoText(item.text)
-               
-              }}
-              >
-                Edit</button>
-              <button
-                onClick={() => changeIsDone(item.id)}
-                className="btn btn-sm btn-secondary"
-              >
-                {item.isDone === false ? "Done" : "Undone"}
-              </button>
-            </div>
-            
-            </div>
+            <Todo
+              item={item}
+              deleteTodo={deleteTodo}
+              setIsEdit={setIsEdit}
+              setWillUpdateTodo={setWillUpdateTodo}
+              setTodoText={setTodoText}
+              changeIsDone={changeIsDone}
+            />
           ))}
-          </>
-          
-         )}
+        </>
+      )}
     </div>
   );
 }
